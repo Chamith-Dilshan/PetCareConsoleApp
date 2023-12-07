@@ -15,7 +15,8 @@ namespace ConsoleApp
     internal class Program
     {
         static void Main()
-        {
+        {   
+            // create a list of instcance of Animal class
             List<Animal> ourAnimal = new List<Animal>
             {
             new Animal { Id = "100", Species = "dog", Age = "1", PhysicalCondition = "good", Personality = "active", Nickname = "kila" },
@@ -26,7 +27,7 @@ namespace ConsoleApp
 
             Console.WriteLine("Please Select an Option from the menu: ");
             Console.WriteLine("Enter 'exit' to exit the program\n");
-            Console.WriteLine("1. List all of our current pet information.\r\n2. Add new Animal Details.\r\n3. Edit an animal Details.\r\n4. Delete an animal Details.\r\n5. Display all cats with a specified characteristic.\r\n6. Display all dogs with a specified characteristic.\n");
+            Console.WriteLine("1. List all of our current pet information.\r\n2. Add new Animal Details.\r\n3. Edit an animal Details.\r\n4. Delete an animal Details.\r\n5. Display selected pets' details.\n");
 
             string? userInput;
             int menuNumber = 0;
@@ -50,16 +51,28 @@ namespace ConsoleApp
                     switch (menuNumber)
                     {
                         case 1:
+                            Console.WriteLine("All the pets details - ");
                             ListAllPetInformation(ourAnimal);
                             break;
 
                         case 2:
-                            AddNewAnimalDetails(ourAnimal, petId++);
+                            Console.WriteLine("Add New pet details -");
+                            AddNewAnimalDetails(ourAnimal, petId);
+                            petId++;
                             break;
-
                         case 3:
-
-
+                            Console.WriteLine("Edit pets' details - ");
+                            EditAnimalDetails(ourAnimal);
+                            break;
+                        case 4:
+                            Console.WriteLine("Delete selected pets' details - ");
+                            DeleteSelectedPetDetails(ourAnimal);
+                            break;
+                        case 5:
+                            Console.WriteLine("Selected Pets' details - ");
+                            string id = GetUserInput("Enter PetId: ");
+                            ListSelectedPetInformation(ourAnimal, id);
+                            break;                           
                         default:
                             Console.WriteLine("Invalid menu option.");
                             break;
@@ -69,7 +82,31 @@ namespace ConsoleApp
             } while (userInput != "exit");
         }
 
-        static void ListAllPetInformation(List<Animal> animals)
+        private static void EditAnimalDetails(List<Animal> animals)
+        {
+            string id = GetUserInput("Enter PetId: ");
+            ListSelectedPetInformation(animals, id);
+
+            Animal animalToEdit = animals.Find(a => a.Id == id);
+
+            if (animalToEdit != null)
+            {
+                //Allow user to update the information
+                animalToEdit.Species = GetUserInput("New pet species (cat or dog):");
+                animalToEdit.Age = GetUserInput("New pet age (years):");
+                animalToEdit.PhysicalCondition = GetUserInput("New description of the pet's physical condition/characteristics:");
+                animalToEdit.Personality = GetUserInput("New description of the pet's personality:");
+                animalToEdit.Nickname = GetUserInput("New pet's nickname:");
+
+                Console.WriteLine("Pet Details updated successfully!");
+            }
+            else
+            {
+                Console.WriteLine($"Pet with ID {id} not found.");
+            }
+        }
+
+        private static void ListAllPetInformation(List<Animal> animals)
         {
             foreach (var animal in animals)
             {
@@ -82,7 +119,26 @@ namespace ConsoleApp
             }
         }
 
-        static void AddNewAnimalDetails(List<Animal> animals, int petId)
+        private static void ListSelectedPetInformation(List<Animal> animals, string id) {
+
+            Animal animalToEdit = animals.Find(a => a.Id == id);
+            if (animalToEdit != null)
+            {
+                Console.WriteLine($"Current details for Pet ID # {animalToEdit.Id}:");
+                Console.WriteLine($"Pet species : {animalToEdit.Species}");
+                Console.WriteLine($"Pet age : {animalToEdit.Age}");
+                Console.WriteLine($"Pet's physical condition/characteristics : {animalToEdit.PhysicalCondition}");
+                Console.WriteLine($"Pet's personality : {animalToEdit.Personality}");
+                Console.WriteLine($"Pet's nickname : {animalToEdit.Nickname}\n");
+            }
+            else
+            {
+                // If the specified ID is not found, print an error message
+                Console.WriteLine($"Pet with ID {id} not found.");
+            }
+        }
+
+        private static void AddNewAnimalDetails(List<Animal> animals, int petId)
         {
             Animal newAnimal = new Animal
             {
@@ -98,7 +154,25 @@ namespace ConsoleApp
             Console.WriteLine("Pet Details added successfully!");
         }
 
-        static string GetUserInput(string prompt)
+        private static void DeleteSelectedPetDetails(List<Animal> animals) {
+
+            string id = GetUserInput("Enter PetId: ");
+            ListSelectedPetInformation(animals, id);
+
+            Animal animalToDelete = animals.Find(a => a.Id == id);
+
+            if (animalToDelete != null)
+            {
+                animals.Remove(animalToDelete);
+                Console.WriteLine("Pets' details removed successfully");
+            }
+            else
+            {
+                Console.WriteLine($"Pet with ID {id} not found.");
+            }
+        }
+
+        private static string GetUserInput(string prompt)
         {
             string userInput;
             do
